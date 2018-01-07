@@ -6,6 +6,7 @@ import http.server
 import json
 import subprocess
 import os
+import hmac
 
 instances = {}
 
@@ -18,8 +19,21 @@ class WebhookHandler(http.server.BaseHTTPRequestHandler):
             return
 
         req_len = int(self.headers['Content-Length'])
-        req_data = json.loads(self.rfile.read(req_len).decode("utf-8"))
+        req_bytes = self.rfile.read(req_len)
+        req_data = json.loads(req_bytes.decode("utf-8"))
         
+        if "secret" in CONFIG:
+            req_sig = self.headers["X-Hub-Signature"]
+            hmac_bytes = hmac.new(CONFIG["secret"].encode("utf-8"), msg=req_bytes).digest()
+            hmac_sig = "sha1=" + hmac_bytes.hex()
+
+            if hmac_sig != req_sig:
+                print("rejecting deployment: bad signature")
+                self.send_response(403)
+                self.end_headers()
+                return
+
+
         print("deploying", self.path)
 
         if self.path in instances:

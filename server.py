@@ -35,7 +35,7 @@ class WebhookHandler(http.server.BaseHTTPRequestHandler):
             # make sure that the previous instance is done
             instances[self.path].wait()
         
-        instances[self.path] = subprocess.Popen(["sh", "-c", CONFIG["projects"][self.path]["script"]], cwd="./"+self.path)
+        instances[self.path] = subprocess.Popen(CONFIG["projects"][self.path]["script"], cwd="./"+self.path, shell=True)
 
         print("deployed", self.path, "pid={}".format(instances[self.path].pid))
         self.send_response(200)

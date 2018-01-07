@@ -20,14 +20,6 @@ class WebhookHandler(http.server.BaseHTTPRequestHandler):
         req_len = int(self.headers['Content-Length'])
         req_data = json.loads(self.rfile.read(req_len).decode("utf-8"))
         
-        if (req_data["action"] != "published" or
-            (req_data["release"]["prerelease"]
-             and not CONFIG[self.path]["prerelease"])):
-            # reject the deployment
-            self.send_response(200)
-            self.end_headers()
-            return
-        
         print("deploying", self.path)
 
         if self.path in instances:

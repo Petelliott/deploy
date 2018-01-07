@@ -35,12 +35,7 @@ class WebhookHandler(http.server.BaseHTTPRequestHandler):
                 self.end_headers()
                 return
 
-
         print("deploying", self.path)
-
-        if self.path in instances:
-            # properly kill all children of our process
-            subprocess.run(["pkill", "-TERM", "-P", str(instances[self.path].pid)])
 
         if os.path.isdir("./"+self.path):
             subprocess.run(["git", "-C", "./"+self.path, "pull", "git@github.com:{}.git".format(self.path)], env=GIT_ENV)
@@ -48,7 +43,8 @@ class WebhookHandler(http.server.BaseHTTPRequestHandler):
             subprocess.run(["git", "clone", "git@github.com:{}.git".format(self.path), "./"+self.path], env=GIT_ENV)
         
         if self.path in instances:
-            # make sure that the previous instance is done
+            # kill the previous instance and make sure it completes
+            subprocess.run(["pkill", "-TERM", "-P", str(instances[self.path].pid)])
             instances[self.path].wait()
         
         instances[self.path] = subprocess.Popen(CONFIG["projects"][self.path]["script"], cwd="./"+self.path, shell=True)

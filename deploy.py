@@ -7,6 +7,7 @@ import json
 import subprocess
 import os
 import hmac
+import hashlib
 
 instances = {}
 
@@ -24,7 +25,7 @@ class WebhookHandler(http.server.BaseHTTPRequestHandler):
         
         if "secret" in CONFIG:
             req_sig = self.headers["X-Hub-Signature"]
-            hmac_bytes = hmac.new(CONFIG["secret"].encode("utf-8"), msg=req_bytes).digest()
+            hmac_bytes = hmac.new(CONFIG["secret"].encode("utf-8"), req_bytes, hashlib.sha1).digest()
             hmac_sig = "sha1=" + hmac_bytes.hex()
 
             if hmac_sig != req_sig:

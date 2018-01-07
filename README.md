@@ -39,3 +39,8 @@ the name of a project must correspond to GitHub path of the project with a prece
 ```
 python3 deploy.py config.json
 ```
+
+## requirements
+
+- python 3.5 or newer
+- git 2.3 or newer

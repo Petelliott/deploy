@@ -16,6 +16,7 @@ a little script to deploy your code using webhooks. MIT license
 the name of a project must correspond to GitHub path of the project with a preceding slash (for now).
  
 | attribute | description |
+|-----------|-------------|
 | `script`  | the valid /bin/sh command that will be executed in your project directory when triggered by GitHub |
 
 ## running

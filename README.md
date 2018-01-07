@@ -19,6 +19,21 @@ the name of a project must correspond to GitHub path of the project with a prece
 |-----------|-------------|
 | `script`  | the valid /bin/sh command that will be executed in your project directory when triggered by GitHub |
 
+### example config
+
+```json
+{
+    "port": 8000,
+    "ssh_key": "~/.ssh/id_ecdsa",
+    "secret": "7d38cdd689735b008b3c702edd92eea23791c5f6",
+    "projects": {
+        "/petelliott/bbs": {
+            "script": "make && ./bbs"
+        }
+    }
+}
+```
+
 ## running
 
 ```

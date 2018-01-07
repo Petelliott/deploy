@@ -21,7 +21,8 @@ class WebhookHandler(http.server.BaseHTTPRequestHandler):
 
         req_len = int(self.headers['Content-Length'])
         req_bytes = self.rfile.read(req_len)
-        req_data = json.loads(req_bytes.decode("utf-8"))
+        # the following line currently has no use, but will be used in the future
+        # req_data = json.loads(req_bytes.decode("utf-8"))
         
         if "secret" in CONFIG:
             req_sig = self.headers["X-Hub-Signature"]

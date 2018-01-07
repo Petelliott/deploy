@@ -8,7 +8,8 @@ a little script to deploy your code using webhooks. MIT license
 |-----------|-------------|
 | `ssh_key` | the ssh key that is configured for deployment on your repos. must have no password. if left blank, default ssh key will be used |
 | `secret`  | the secret that is provided to GitHub for the webhook. if left blank, signatures will not be checked |
-| `projects` | a json object of the projects that are deployed |
+| `projects`| a json object of the projects that are deployed |
+| `port`    | the port that the server will run on |
 
 ### project configuration
 

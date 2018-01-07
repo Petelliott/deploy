@@ -26,10 +26,17 @@ class WebhookHandler(http.server.BaseHTTPRequestHandler):
         
         if "secret" in CONFIG:
             req_sig = self.headers["X-Hub-Signature"]
+            
+            if req_sig is None:
+                print("rejecting deployment: no signature")
+                self.send_response(403)
+                self.end_headers()
+                return
+            
             hmac_bytes = hmac.new(CONFIG["secret"].encode("utf-8"), req_bytes, hashlib.sha1).digest()
             hmac_sig = "sha1=" + hmac_bytes.hex()
 
-            if hmac_sig != req_sig:
+            if not hmac.compare_digest(hmac_sig, req_sig):
                 print("rejecting deployment: bad signature")
                 self.send_response(403)
                 self.end_headers()

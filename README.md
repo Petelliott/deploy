@@ -18,6 +18,7 @@ the name of a project must correspond to GitHub path of the project with a prece
 | attribute | description |
 |-----------|-------------|
 | `script`  | the valid /bin/sh command that will be executed in your project directory when triggered by GitHub |
+| `branch`  | the branch to be run. defaults to master |
 
 ### example config
 

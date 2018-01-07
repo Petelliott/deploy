@@ -29,7 +29,8 @@ the name of a project must correspond to GitHub path of the project with a prece
     "secret": "7d38cdd689735b008b3c702edd92eea23791c5f6",
     "projects": {
         "/petelliott/bbs": {
-            "script": "make && ./bbs"
+            "script": "make && ./bbs",
+            "branch": "testing"
         }
     }
 }

@@ -11,6 +11,8 @@ a little script to deploy your code using webhooks. MIT license
 | `projects`| a json object of the projects that are deployed |
 | `port`    | the port that the server will run on. defaults to 80 |
 
+every attribute other that port will be reloaded if the file changes, without reqireing a restart
+
 ### project configuration
 
 the name of a project must correspond to GitHub path of the project with a preceding slash (for now).

@@ -14,6 +14,22 @@ instances = {}
 
 class WebhookHandler(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
+        global CONFIG
+        global CONF_TIME
+        global instances
+        global GIT_ENV 
+
+        new_cnf_tme = os.path.getmtime(sys.argv[1])
+        if new_cnf_tme > CONF_TIME:
+            print("reloading config")
+            CONFIG = json.load(open(sys.argv[1]))
+            CONF_TIME = new_cnf_tme
+
+            GIT_ENV = os.environ.copy()
+            if "ssh_key" in CONFIG:
+                GIT_ENV["GIT_SSH_COMMAND"] = "ssh -i " + CONFIG["ssh_key"]
+ 
+        
         if self.path not in CONFIG["projects"]:
             self.send_response(404)
             self.end_headers()
@@ -71,6 +87,7 @@ class WebhookHandler(http.server.BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     CONFIG = json.load(open(sys.argv[1]))
+    CONF_TIME = os.path.getmtime(sys.argv[1])
     
     GIT_ENV = os.environ.copy()
     if "ssh_key" in CONFIG:

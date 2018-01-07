@@ -12,7 +12,7 @@ instances = {}
 
 class WebhookHandler(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
-        if self.path not in CONFIG:
+        if self.path not in CONFIG["projects"]:
             self.send_response(404)
             self.end_headers()
             return
@@ -27,15 +27,15 @@ class WebhookHandler(http.server.BaseHTTPRequestHandler):
             subprocess.run(["pkill", "-TERM", "-P", str(instances[self.path].pid)])
 
         if os.path.isdir("./"+self.path):
-            subprocess.run(["git", "-C", "./"+self.path, "pull", "git@github.com:{}.git".format(self.path)])
+            subprocess.run(["git", "-C", "./"+self.path, "pull", "git@github.com:{}.git".format(self.path)], env=GIT_ENV)
         else:
-            subprocess.run(["git", "clone", "git@github.com:{}.git".format(self.path), "./"+self.path])
+            subprocess.run(["git", "clone", "git@github.com:{}.git".format(self.path), "./"+self.path], env=GIT_ENV)
         
         if self.path in instances:
             # make sure that the previous instance is done
             instances[self.path].wait()
         
-        instances[self.path] = subprocess.Popen(["sh", "-c", CONFIG[self.path]["script"]], cwd="./"+self.path)
+        instances[self.path] = subprocess.Popen(["sh", "-c", CONFIG["projects"][self.path]["script"]], cwd="./"+self.path)
 
         print("deployed", self.path, "pid={}".format(instances[self.path].pid))
         self.send_response(200)
@@ -43,7 +43,11 @@ class WebhookHandler(http.server.BaseHTTPRequestHandler):
  
 
 if __name__ == "__main__":
-     CONFIG = json.load(open(sys.argv[1]))
+    CONFIG = json.load(open(sys.argv[1]))
+    
+    GIT_ENV = os.environ.copy()
+    if "ssh_key" in CONFIG:
+        GIT_ENV["GIT_SSH_COMMAND"] = "ssh -i " + CONFIG["ssh_key"]
 
-     httpd = http.server.HTTPServer(('', 8000), WebhookHandler)
-     httpd.serve_forever()
+    httpd = http.server.HTTPServer(('', 8000), WebhookHandler)
+    httpd.serve_forever()

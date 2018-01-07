@@ -62,6 +62,11 @@ if __name__ == "__main__":
     GIT_ENV = os.environ.copy()
     if "ssh_key" in CONFIG:
         GIT_ENV["GIT_SSH_COMMAND"] = "ssh -i " + CONFIG["ssh_key"]
+    
+    if "port" in CONFIG:
+        port = CONFIG["port"]
+    else:
+        port = 80
 
-    httpd = http.server.HTTPServer(('', 8000), WebhookHandler)
+    httpd = http.server.HTTPServer(('', port), WebhookHandler)
     httpd.serve_forever()

@@ -66,12 +66,12 @@ class WebhookHandler(http.server.BaseHTTPRequestHandler):
             branch = "master"
 
         if os.path.isdir("./"+self.path):
-            subprocess.run(["git", "checkout", branch])
+            subprocess.run(["git", "-C", "./"+self.path, "checkout", branch])
             subprocess.run(["git", "-C", "./"+self.path, "pull", "git@github.com:{}.git".format(self.path)], env=GIT_ENV)
         else:
             subprocess.run(["git", "clone", "git@github.com:{}.git".format(self.path), "./"+self.path], env=GIT_ENV)
-            subprocess.run(["git", "checkout", branch])
-            subprocess.run(["git", "pull"], env=GIT_ENV)
+            subprocess.run(["git", "-C", "./"+self.path, "checkout", branch])
+            subprocess.run(["git", "-C", "./"+self.path, "pull"], env=GIT_ENV)
         
         if self.path in instances:
             # kill the previous instance and make sure it completes

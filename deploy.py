@@ -19,16 +19,20 @@ def get_get_config(path):
     config = None
 
     def get_config():
+        nonlocal conf_time
+        nonlocal config
+
         new_cnf_tme = os.path.getmtime(path)
         if new_cnf_tme > conf_time:
+            conf_time = new_cnf_tme
             # reload config
             config = json.load(open(path))
-            
+
             config["git_env"] = os.environ.copy()
             if "ssh_key" in config:
                 config["git_env"]["GIT_SSH_COMMAND"] = "ssh -i " + config["ssh_key"]
 
-            for proj in config["projects"].items():
+            for proj in config["projects"].values():
                 if "branch" not in proj:
                     proj["branch"] = "master"
 
@@ -78,11 +82,11 @@ def make_handler(get_config):
             print("deploying", self.path)
 
             if os.path.isdir("./"+self.path):
-                subprocess.run(["git", "-C", "./"+self.path, "checkout", config[projects][self.path]["branch"]])
+                subprocess.run(["git", "-C", "./"+self.path, "checkout", config["projects"][self.path]["branch"]])
                 subprocess.run(["git", "-C", "./"+self.path, "pull", "git@github.com:{}.git".format(self.path)], env=config["git_env"])
             else:
                 subprocess.run(["git", "clone", "git@github.com:{}.git".format(self.path), "./"+self.path], env=config["git_env"])
-                subprocess.run(["git", "-C", "./"+self.path, "checkout", config[projects][self.path]["branch"]])
+                subprocess.run(["git", "-C", "./"+self.path, "checkout", config["projects"][self.path]["branch"]])
                 subprocess.run(["git", "-C", "./"+self.path, "pull"], env=config["git_env"])
             
             if self.path in instances:
@@ -96,7 +100,7 @@ def make_handler(get_config):
             self.send_response(200)
             self.end_headers()
 
-    return WebHookHandler
+    return WebhookHandler
      
 
 if __name__ == "__main__":

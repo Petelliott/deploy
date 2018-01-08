@@ -9,6 +9,35 @@ import os
 import hmac
 import hashlib
 
+
+def get_get_config(path):
+    """
+    given the path of a json config file,
+    returns a function that will give the current config
+    """
+    conf_time = -float("inf")
+    config = None
+
+    def get_config():
+        new_cnf_tme = os.path.getmtime(path)
+        if new_cnf_tme > conf_time:
+            # reload config
+            config = json.load(open(path))
+            
+            config["git_env"] = os.environ.copy()
+            if "ssh_key" in config:
+                config["git_env"]["GIT_SSH_COMMAND"] = "ssh -i " + config["ssh_key"]
+
+            for proj in config["projects"].items():
+                if "branch" not in proj:
+                    proj["branch"] = "master"
+
+        return config
+    
+    return get_config
+
+
+
 instances = {}
 
 
